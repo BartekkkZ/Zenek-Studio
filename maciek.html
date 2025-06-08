@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Test wideo z dźwiękiem</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: black;
+    }
+    video {
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+    }
+    #playButton {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <video autoplay loop muted playsinline id="bg-video">
+    <source src="dance.mp4" type="video/mp4">
+    Twoja przeglądarka nie obsługuje wideo.
+  </video>
+
+  <audio id="bg-audio" loop>
+    <source src="piosnka.mp3" type="audio/mpeg">
+    Twoja przeglądarka nie obsługuje audio.
+  </audio>
+
+  <button id="playButton">Kliknij, aby włączyć dźwięk</button>
+
+  <script>
+    const audio = document.getElementById('bg-audio');
+    const button = document.getElementById('playButton');
+
+    button.addEventListener('click', () => {
+      audio.play();
+      button.remove(); // usuwa przycisk po kliknięciu
+    });
+  </script>
+
+</body>
+</html>

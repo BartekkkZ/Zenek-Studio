@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dziękujemy za zakup biletu!</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a14, #1a1f2b);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      margin: 0;
+    }
+    .thankyou-box {
+      background: rgba(20, 20, 40, 0.85);
+      border-radius: 20px;
+      padding: 2rem 3rem;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 0 40px #ff0000cc;
+      text-align: center;
+      animation: fadeIn 0.8s ease forwards;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #ff4444;
+      text-shadow: 0 0 10px #ff0000cc;
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      color: #eee;
+    }
+    .ticket {
+      background: #220000bb;
+      border-radius: 15px;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 0 25px #ff000077;
+      text-align: left;
+      font-size: 1.1rem;
+      line-height: 1.5;
+      user-select: none;
+    }
+    .ticket-title {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+      color: #ff6666;
+      text-shadow: 0 0 6px #ff0000aa;
+    }
+    .ticket-line {
+      margin-bottom: 0.5rem;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    a.back-link {
+      margin-top: 2rem;
+      display: inline-block;
+      color: #ff6666;
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    a.back-link:hover {
+      color: #ff2222;
+    }
+    .floating-button {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #ff4444;
+      color: white;
+      border: none;
+      padding: 1rem 1.5rem;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px #ff4444cc;
+      transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+      z-index: 1000;
+      user-select: none;
+    }
+    #beerButton { right: 1rem; }
+    #maciekButton { left: 1rem; }
+  </style>
+</head>
+<body>
+
+  <div class="thankyou-box" role="main" aria-live="polite" aria-atomic="true">
+    <h1>Dziękujemy za zakup!</h1>
+    <p>Poniżej znajdziesz swój bilet. Prosimy o zrobienie screena i uregulowanie płatności u Zenek Studios®.</p>
+    <div class="ticket" id="ticketDisplay" aria-label="Bilet kinowy"></div>
+    <a href="kup-bilety.html" class="back-link" aria-label="Wróć do strony zakupu biletu">← Wróć do zakupu biletów</a>
+  </div>
+
+  <!-- Postaw mi piwo -->
+  <button id="beerButton" class="floating-button" aria-label="Postaw mi piwo 🍺">
+    Postaw mi piwo 🍺
+  </button>
+
+  <!-- Maciek ci dziękuje -->
+  <button id="maciekButton" class="floating-button" aria-label="Maciek ci dziękuje">
+    Maciek ci dziękuje 🙏
+  </button>
+
+  <script>
+    const orderData = JSON.parse(localStorage.getItem('ticketOrder'));
+    const ticketDisplay = document.getElementById('ticketDisplay');
+
+    if (!orderData) {
+      ticketDisplay.innerHTML = '<p style="color:#ff4444; font-weight:700;">Brak danych zamówienia. Prosimy wrócić do strony zakupu biletów.</p>';
+    } else {
+      const ticketNames = {
+        normal: 'Bilet Normalny',
+        ulgowy: 'Bilet Ulgowy'
+      };
+      const paymentNames = {
+        blik: 'BLIK',
+        paypal: 'PayPal',
+        zen: 'Zen'
+      };
+      const sessionNames = {
+        'maciek-poczatki': 'Maciek "Początki" - data nie znana'
+      };
+
+      ticketDisplay.innerHTML = `
+        <div class="ticket-title">${ticketNames[orderData.ticketType] || orderData.ticketType}</div>
+        <div class="ticket-line"><strong>Imię i nazwisko:</strong> ${orderData.fullname}</div>
+        <div class="ticket-line"><strong>Ilość biletów:</strong> ${orderData.quantity}</div>
+        <div class="ticket-line"><strong>Seans:</strong> ${sessionNames[orderData.session] || orderData.session}</div>
+        <div class="ticket-line"><strong>Metoda płatności:</strong> ${paymentNames[orderData.payment] || orderData.payment}</div>
+        <div class="ticket-line"><strong>Cena całkowita:</strong> ${orderData.ticketType === 'normal' ? (orderData.quantity * 1).toFixed(2) : (orderData.quantity * 0.5).toFixed(2)} zł</div>
+      `;
+
+      localStorage.removeItem('ticketOrder');
+    }
+
+    // Postaw mi piwo
+    const beerBtn = document.getElementById('beerButton');
+    beerBtn.addEventListener('mouseenter', () => {
+      beerBtn.style.background = '#ff2222';
+      beerBtn.style.boxShadow = '0 0 25px #ff2222cc';
+      beerBtn.style.transform = 'translateY(-50%) scale(1.1)';
+    });
+    beerBtn.addEventListener('mouseleave', () => {
+      beerBtn.style.background = '#ff4444';
+      beerBtn.style.boxShadow = '0 0 15px #ff4444cc';
+      beerBtn.style.transform = 'translateY(-50%) scale(1)';
+    });
+    beerBtn.addEventListener('click', () => {
+      alert('Koszt pifka to 5zl, prosze skontaktowac się z bartkiem w celu sfinalizowania dotacji');
+    });
+
+    // Maciek ci dziękuje
+    const maciekBtn = document.getElementById('maciekButton');
+    maciekBtn.addEventListener('mouseenter', () => {
+      maciekBtn.style.background = '#ff2222';
+      maciekBtn.style.boxShadow = '0 0 25px #ff2222cc';
+      maciekBtn.style.transform = 'translateY(-50%) scale(1.1)';
+    });
+    maciekBtn.addEventListener('mouseleave', () => {
+      maciekBtn.style.background = '#ff4444';
+      maciekBtn.style.boxShadow = '0 0 15px #ff4444cc';
+      maciekBtn.style.transform = 'translateY(-50%) scale(1)';
+    });
+    maciekBtn.addEventListener('click', () => {
+      window.location.href = 'maciek.html';
+    });
+  </script>
+
+</body>
+</html>
