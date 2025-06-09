@@ -12,7 +12,8 @@
       color: white;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: flex-start;
       align-items: center;
       padding: 2rem;
       margin: 0;
@@ -26,6 +27,7 @@
       box-shadow: 0 0 40px #ff0000cc;
       text-align: center;
       animation: fadeIn 0.8s ease forwards;
+      transition: transform 0.8s ease;
     }
     h1 {
       font-size: 2.5rem;
@@ -93,11 +95,33 @@
     }
     #beerButton { right: 1rem; }
     #maciekButton { left: 1rem; }
+
+    /* Stylowanie kontenera na film */
+    #videoContainer {
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      max-width: 720px;
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+    #videoContainer.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body>
 
-  <div class="thankyou-box" role="main" aria-live="polite" aria-atomic="true">
+  <!-- Kontener na film -->
+  <div id="videoContainer" class="hidden">
+    <video id="customVideo" class="w-full rounded-xl shadow-lg" controls autoplay>
+      <source src="end.webm" type="video/webm" />
+      Twoja przeglądarka nie obsługuje wideo.
+    </video>
+  </div>
+
+  <div class="thankyou-box" id="thankyouBox" role="main" aria-live="polite" aria-atomic="true">
     <h1>Dziękujemy za zakup!</h1>
     <p>Poniżej znajdziesz swój bilet. Prosimy o zrobienie screena i uregulowanie płatności u Zenek Studios®.</p>
     <div class="ticket" id="ticketDisplay" aria-label="Bilet kinowy"></div>
@@ -145,6 +169,15 @@
 
       localStorage.removeItem('ticketOrder');
     }
+
+    // Przesunięcie okienka i pokazanie filmu po 3 sekundach
+    setTimeout(() => {
+      const thankyouBox = document.getElementById('thankyouBox');
+      const videoContainer = document.getElementById('videoContainer');
+      videoContainer.classList.remove('hidden');
+      videoContainer.classList.add('visible');
+      thankyouBox.style.transform = 'translateY(200px)';
+    }, 3000);
 
     // Postaw mi piwo
     const beerBtn = document.getElementById('beerButton');
