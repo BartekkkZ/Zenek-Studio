@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Test wideo z dźwiękiem</title>
+  <title>Maciek goofy Dance</title>
   <style>
     html, body {
       margin: 0;
@@ -12,17 +12,19 @@
       background: black;
     }
     video {
-      width: 100vw;
-      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
     }
   </style>
 </head>
 <body>
 
-  <video autoplay loop playsinline id="bg-video" controls>
-    <source src="dance.mp4" type="video/mp4">
-    Twoja przeglądarka nie obsługuje wideo.
+  <video autoplay muted loop playsinline>
+    <source src="dance.webm" type="video/webm">
   </video>
 
 </body>
