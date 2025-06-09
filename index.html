@@ -78,7 +78,6 @@
       background-color: rgba(255, 0, 0, 0.7);
     }
 
-    /* Animowane napisy w rogach */
     .corner-text {
       position: absolute;
       font-size: 1rem;
@@ -99,7 +98,6 @@
     .bottom-left { bottom: 10px; left: 10px; }
     .bottom-right{ bottom: 10px; right: 10px; }
 
-    /* Animacja przycisku "Kup bilety" */
     .buy-button-animated {
       position: relative;
       overflow: hidden;
@@ -110,7 +108,7 @@
     .buy-button-animated::before {
       content: "";
       position: absolute;
-      top: 150%;       /* przesunięcie efektu niżej */
+      top: 150%;
       left: -100%;
       width: 200%;
       height: 200%;
@@ -129,14 +127,30 @@
       transform: scale(1.08);
     }
 
+    #mainContent {
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translate(-50%, 0);
+      opacity: 0;
+      transition: all 1.5s ease;
+      text-align: center;
+      z-index: 10;
+    }
+
+    #mainContent.show {
+      bottom: 50%;
+      transform: translate(-50%, 50%);
+      opacity: 1;
+    }
   </style>
 </head>
-<body class="flex items-center justify-center h-screen text-white relative">
+<body class="text-white relative h-full w-full">
 
   <!-- Gradient startowy -->
   <div id="startGradient" class="start-gradient"></div>
 
-  <!-- Napisy "Zenek Studios®" -->
+  <!-- Napisy Zenek Studios -->
   <div class="corner-text top-left">Zenek Studios®</div>
   <div class="corner-text top-right">Zenek Studios®</div>
   <div class="corner-text bottom-left">Zenek Studios®</div>
@@ -145,14 +159,14 @@
   <!-- Film -->
   <video id="backgroundVideo" class="bg-video">
     <source src="maintrailer.mp4" type="video/mp4">
-    Twój przeglądarka nie wspiera odtwarzania wideo.
+    Twoja przeglądarka nie wspiera odtwarzania wideo.
   </video>
 
   <!-- Gradient po filmie -->
   <div id="gradientBackground" class="bg-gradient-hidden"></div>
 
   <!-- Treść główna -->
-  <div class="text-center z-10" id="mainContent" style="display: none;">
+  <div id="mainContent">
     <h1 class="text-4xl md:text-6xl font-bold mb-10 drop-shadow-lg">Zanurz się w świat filmu</h1>
     <a href="kup-bilety.html"
        class="buy-button-animated bg-white bg-opacity-10 backdrop-blur-lg text-white font-semibold py-4 px-10 rounded-full text-xl shadow-lg transition duration-500 ease-in-out">
@@ -160,11 +174,8 @@
     </a>
   </div>
 
-  <!-- Przycisk "Odtwórz film" -->
+  <!-- Przycisk Odtwórz -->
   <button id="startBtn" class="start-button">Odtwórz film</button>
-
-  <!-- Dźwięk kinowy -->
-  <audio id="boomSound" src="intro_boom.mp3" preload="auto"></audio>
 
   <!-- JavaScript -->
   <script>
@@ -174,13 +185,11 @@
     const mainContent = document.getElementById('mainContent');
     const startGradient = document.getElementById('startGradient');
     const corners = document.querySelectorAll('.corner-text');
-    const boom = document.getElementById('boomSound');
 
     startBtn.addEventListener('click', () => {
       startBtn.style.display = 'none';
       startGradient.style.display = 'none';
       corners.forEach(el => el.style.display = 'none');
-      boom.play(); // Dźwięk boom
       video.style.display = 'block';
       video.play().catch(err => {
         alert("Nie udało się odtworzyć filmu: " + err.message);
@@ -190,7 +199,7 @@
     video.addEventListener('ended', () => {
       video.style.display = 'none';
       gradient.classList.add('bg-gradient-visible');
-      mainContent.style.display = 'block';
+      mainContent.classList.add('show');
     });
   </script>
 
