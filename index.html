@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spółka z ograniczoną odpowiedzialnością</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      display: none;
+    }
+
+    .bg-gradient-hidden {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, #000000, #1a1a2e, #0f0f1a);
+      z-index: -1;
+      transition: opacity 1s ease;
+    }
+
+    .bg-gradient-visible {
+      display: block;
+      opacity: 1;
+    }
+
+    .start-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(270deg, #0d0d0d, #1a1f2b, #0a0a14);
+      background-size: 400% 400%;
+      animation: backgroundShift 20s ease infinite;
+      z-index: -2;
+    }
+
+    @keyframes backgroundShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .start-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      font-size: 1.5rem;
+      padding: 1rem 2rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      z-index: 50;
+      transition: background 0.3s ease;
+    }
+
+    .start-button:hover {
+      background-color: rgba(255, 0, 0, 0.7);
+    }
+
+    .corner-text {
+      position: absolute;
+      font-size: 1rem;
+      color: #aaa;
+      z-index: 40;
+      font-family: monospace;
+      opacity: 0.5;
+      animation: pulse 3s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    .top-left    { top: 10px; left: 10px; }
+    .top-right   { top: 10px; right: 10px; }
+    .bottom-left { bottom: 10px; left: 10px; }
+    .bottom-right{ bottom: 10px; right: 10px; }
+
+    .buy-button-animated {
+      position: relative;
+      overflow: hidden;
+      z-index: 0;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .buy-button-animated::before {
+      content: "";
+      position: absolute;
+      top: 150%;
+      left: -100%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(120deg, rgba(255, 0, 0, 0.3), rgba(255, 255, 255, 0.1), rgba(255, 0, 0, 0.3));
+      transform: skewX(-20deg);
+      transition: left 0.5s ease-in-out;
+      z-index: -1;
+    }
+
+    .buy-button-animated:hover::before {
+      left: 100%;
+    }
+
+    .buy-button-animated:hover {
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.7), 0 0 60px rgba(255, 0, 0, 0.3);
+      transform: scale(1.08);
+    }
+
+    #mainContent {
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translate(-50%, 0);
+      opacity: 0;
+      transition: all 1.5s ease;
+      text-align: center;
+      z-index: 10;
+    }
+
+    #mainContent.show {
+      bottom: 50%;
+      transform: translate(-50%, 50%);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="text-white relative h-full w-full">
+
+  <!-- Gradient startowy -->
+  <div id="startGradient" class="start-gradient"></div>
+
+  <!-- Napisy Zenek Studios -->
+  <div class="corner-text top-left">Zenek Studios®</div>
+  <div class="corner-text top-right">Zenek Studios®</div>
+  <div class="corner-text bottom-left">Zenek Studios®</div>
+  <div class="corner-text bottom-right">Zenek Studios®</div>
+
+  <!-- Film -->
+  <video id="backgroundVideo" class="bg-video">
+    <source src="maintrailer.webm" type="video/mp4">
+    Twoja przeglądarka nie wspiera odtwarzania wideo.
+  </video>
+
+  <!-- Gradient po filmie -->
+  <div id="gradientBackground" class="bg-gradient-hidden"></div>
+
+  <!-- Treść główna -->
+  <div id="mainContent">
+    <h1 class="text-4xl md:text-6xl font-bold mb-10 drop-shadow-lg">Zanurz się w świat filmu</h1>
+    <a href="kup-bilety.html"
+       class="buy-button-animated bg-white bg-opacity-10 backdrop-blur-lg text-white font-semibold py-4 px-10 rounded-full text-xl shadow-lg transition duration-500 ease-in-out">
+      Kup bilety
+    </a>
+  </div>
+
+  <!-- Przycisk Odtwórz -->
+  <button id="startBtn" class="start-button">Odtwórz film</button>
+
+  <!-- JavaScript -->
+  <script>
+    const video = document.getElementById('backgroundVideo');
+    const gradient = document.getElementById('gradientBackground');
+    const startBtn = document.getElementById('startBtn');
+    const mainContent = document.getElementById('mainContent');
+    const startGradient = document.getElementById('startGradient');
+    const corners = document.querySelectorAll('.corner-text');
+
+    startBtn.addEventListener('click', () => {
+      startBtn.style.display = 'none';
+      startGradient.style.display = 'none';
+      corners.forEach(el => el.style.display = 'none');
+      video.style.display = 'block';
+      video.play().catch(err => {
+        alert("Nie udało się odtworzyć filmu: " + err.message);
+      });
+    });
+
+    video.addEventListener('ended', () => {
+      video.style.display = 'none';
+      gradient.classList.add('bg-gradient-visible');
+      mainContent.classList.add('show');
+    });
+  </script>
+
+</body>
+</html>

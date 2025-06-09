@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <title>Moja Gra Dino - powiększone obrazki i hitboxy</title>
+    <style>
+        @keyframes animatedGradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        body {
+            background: linear-gradient(-45deg, #a3c1ff, #8bd3ff, #b4aee8, #a9c6ff);
+            background-size: 400% 400%;
+            animation: animatedGradient 40s ease infinite;
+
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+        }
+
+        #topText {
+            font-size: 50px;
+            font-weight: 900;
+            margin: 10px 0 250px 0;
+            color: #222;
+            user-select: none;
+            text-shadow: 3px 3px 3px rgb(33, 180, 238);
+        }
+
+        canvas {
+            background: #fff;
+            border: 3px solid #000;
+            display: block;
+        }
+
+        #musicBtn {
+            margin-top: 10px;
+            padding: 12px 28px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(101, 64, 249, 0.5);
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.15s ease;
+            user-select: none;
+        }
+        #musicBtn:hover {
+            background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+            transform: scale(1.05);
+        }
+        #musicBtn:active {
+            transform: scale(0.95);
+        }
+
+        #backBtn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            padding: 12px 28px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #444c6a 0%, #6b728e 100%);
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(40, 45, 68, 0.6);
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s ease, transform 0.15s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #backBtn:hover {
+            background: linear-gradient(135deg, #6b728e 0%, #444c6a 100%);
+            transform: scale(1.05);
+        }
+        #backBtn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div id="topText">FREAKY PIĄTEK MAĆKA</div>
+    <canvas id="gameCanvas" width="1000" height="340"></canvas>
+    <button id="musicBtn">Muzyczka</button>
+    <button id="backBtn">Powrót</button>
+
+    <audio id="audio" src="Maciek i Kabanosy (3).mp3"></audio>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const musicBtn = document.getElementById("musicBtn");
+        const backBtn = document.getElementById("backBtn");
+        const audio = document.getElementById("audio");
+
+        const gravity = 0.6;
+        let isJumping = false;
+        let score = 0;
+
+        const playerImg = new Image();
+        playerImg.src = "postac.png";
+
+        const obstacleImg = new Image();
+        obstacleImg.src = "kabanos.png";
+
+        const observerImg = new Image();
+        observerImg.src = "blondi.png";  // podmień na swój plik
+
+        let assetsLoaded = 0;
+        let observerLoaded = false;
+
+        playerImg.onload = () => {
+            assetsLoaded++;
+            if (assetsLoaded === 2 && observerLoaded) gameLoop();
+        };
+
+        obstacleImg.onload = () => {
+            assetsLoaded++;
+            if (assetsLoaded === 2 && observerLoaded) gameLoop();
+        };
+
+        observerImg.onload = () => {
+            observerLoaded = true;
+            if (assetsLoaded === 2 && observerLoaded) gameLoop();
+        };
+
+        const player = {
+            x: 80,
+            y: 50,
+            width: 240,
+            height: 240,
+            velocityY: 0,
+            hitboxOffsetX: 135,
+            hitboxOffsetY: 150,
+            hitboxWidth: 120,
+            hitboxHeight: 90,
+            draw() {
+                ctx.drawImage(playerImg, this.x, this.y, this.width, this.height);
+            },
+            update() {
+                if (this.y < 100 || this.velocityY < 0) {
+                    this.velocityY += gravity;
+                    this.y += this.velocityY;
+                    if (this.y >= 100) {
+                        this.y = 100;
+                        this.velocityY = 0;
+                        isJumping = false;
+                    }
+                }
+            },
+            jump() {
+                if (!isJumping) {
+                    this.velocityY = -16;
+                    isJumping = true;
+                }
+            },
+            reset() {
+                this.y = 100;
+                this.velocityY = 0;
+                isJumping = false;
+            }
+        };
+
+        const obstacle = {
+            x: 1000,
+            y: 225,
+            width: 120,
+            height: 120,
+            speed: 7,
+            hitboxOffsetX: 65,
+            hitboxOffsetY: 0,
+            hitboxWidth: 60,
+            hitboxHeight: 120,
+            draw() {
+                ctx.drawImage(obstacleImg, this.x, this.y, this.width, this.height);
+            },
+            update() {
+                this.x -= this.speed;
+                if (this.x + this.width < 0) {
+                    this.x = 1000 + Math.random() * 500;
+                    score++;
+                }
+            },
+            reset() {
+                this.x = 1000 + Math.random() * 500;
+            }
+        };
+
+        function checkCollision(a, b) {
+            const aBox = {
+                x: a.x + a.hitboxOffsetX,
+                y: a.y + a.hitboxOffsetY,
+                width: a.hitboxWidth,
+                height: a.hitboxHeight
+            };
+            const bBox = {
+                x: b.x + b.hitboxOffsetX,
+                y: b.y + b.hitboxOffsetY,
+                width: b.hitboxWidth,
+                height: b.hitboxHeight
+            };
+
+            return (
+                aBox.x < bBox.x + bBox.width &&
+                aBox.x + aBox.width > bBox.x &&
+                aBox.y < bBox.y + bBox.height &&
+                aBox.y + aBox.height > bBox.y
+            );
+        }
+
+        function drawObserver() {
+            if (!observerLoaded) return;
+            const obsWidth = 160;
+            const obsHeight = 180;
+            const x = canvas.width - obsWidth - -40; // 20px od prawej
+            const y = 170; // na wysokości kabanosów
+
+            ctx.drawImage(observerImg, x, y, obsWidth, obsHeight);
+        }
+
+        let gameOver = false;
+
+        function resetGame() {
+            player.reset();
+            obstacle.reset();
+            score = 0;
+            gameOver = false;
+            gameLoop();
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            player.update();
+            player.draw();
+
+            obstacle.update();
+            obstacle.draw();
+
+            drawObserver();
+
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "#000";
+            ctx.fillText("Wynik: " + score, 20, 30);
+
+            if (checkCollision(player, obstacle)) {
+                gameOver = true;
+                setTimeout(resetGame, 1000);
+            }
+
+            if (!gameOver) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        document.addEventListener("keydown", function(e) {
+            if (e.code === "Space") {
+                e.preventDefault();
+                player.jump();
+            }
+        });
+
+        musicBtn.addEventListener("click", () => {
+            if (audio.paused) {
+                audio.play();
+                musicBtn.textContent = "Muzyka ON";
+            } else {
+                audio.pause();
+                musicBtn.textContent = "Muzyczka";
+            }
+        });
+
+        backBtn.addEventListener("click", () => {
+            window.location.href = "kup-bilety.html";
+        });
+    </script>
+</body>
+</html>
