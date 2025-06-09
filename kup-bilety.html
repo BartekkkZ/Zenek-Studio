@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kup Bilety - Zenek Studios</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a14, #1a1f2b);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px #ff0000aa;
+      z-index: 10;
+      position: relative;
+    }
+
+    .ticket-container {
+      background: rgba(20, 20, 40, 0.75);
+      border-radius: 20px;
+      box-shadow: 0 0 30px #ff000080;
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+      z-index: 10;
+      position: relative;
+    }
+
+    .ticket {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      padding: 1.5rem 2rem;
+      box-shadow: inset 0 0 10px #ff000055;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ticket:hover {
+      background: rgba(255, 0, 0, 0.2);
+      box-shadow: 0 0 15px #ff0000aa;
+    }
+
+    .ticket.selected {
+      background: rgba(255, 0, 0, 0.35);
+      box-shadow: 0 0 25px #ff0000cc;
+      border: 2px solid #ff0000;
+    }
+
+    .ticket-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #ff4444;
+      text-shadow: 0 0 6px #ff0000cc;
+    }
+
+    .ticket-price {
+      font-weight: 600;
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+      color: #fff5f5;
+    }
+
+    .ticket-description {
+      font-size: 1rem;
+      line-height: 1.4;
+      color: #ddd;
+    }
+
+    .buy-button-animated {
+      position: relative;
+      overflow: hidden;
+      z-index: 0;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(6px);
+      border-radius: 9999px;
+      padding: 1rem 2.5rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: center;
+      display: inline-block;
+      user-select: none;
+      transition: box-shadow 0.4s ease;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    .buy-button-animated::before {
+      content: "";
+      position: absolute;
+      top: 130%;
+      left: -100%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(120deg, rgba(255, 0, 0, 0.3), rgba(255, 255, 255, 0.1), rgba(255, 0, 0, 0.3));
+      transform: skewX(-20deg);
+      transition: left 0.6s ease-in-out;
+      z-index: -1;
+    }
+
+    .buy-button-animated:hover::before {
+      left: 100%;
+    }
+
+    .buy-button-animated:hover {
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.7), 0 0 60px rgba(255, 0, 0, 0.3);
+    }
+
+    .regulamin-link {
+      color: #ff6666;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      z-index: 10;
+      position: relative;
+    }
+
+    .regulamin-link:hover {
+      color: #ff2222;
+    }
+
+    footer {
+      margin-top: auto;
+      padding-top: 2rem;
+      font-size: 0.9rem;
+      color: #aaa;
+      z-index: 10;
+      position: relative;
+    }
+
+    .side-animation {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 120px;
+      pointer-events: none;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      gap: 2rem;
+      padding: 1rem 0;
+      user-select: none;
+    }
+
+    .side-animation.left {
+      left: 0;
+      background: linear-gradient(90deg, #0f0f1a, transparent);
+    }
+
+    .side-animation.right {
+      right: 0;
+      background: linear-gradient(270deg, #0f0f1a, transparent);
+    }
+
+    .animated-line {
+      width: 3px;
+      height: 50px;
+      background: linear-gradient(180deg, #ff0000, #ff5555);
+      border-radius: 50px;
+      animation: pulseLine 2s ease-in-out infinite alternate;
+      box-shadow: 0 0 12px #ff0000aa;
+      filter: drop-shadow(0 0 6px #ff0000aa);
+      transform-origin: center;
+    }
+
+    @keyframes pulseLine {
+      0% {
+        opacity: 0.2;
+        transform: scaleY(0.8);
+        box-shadow: 0 0 8px #ff000044;
+      }
+      50% {
+        opacity: 1;
+        transform: scaleY(1.4);
+        box-shadow: 0 0 25px #ff0000cc;
+      }
+      100% {
+        opacity: 0.2;
+        transform: scaleY(0.8);
+        box-shadow: 0 0 8px #ff000044;
+      }
+    }
+
+    .glitch-shape {
+      width: 20px;
+      height: 20px;
+      background: #ff0000cc;
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      animation: glitchMove 3s linear infinite alternate;
+      box-shadow: 0 0 8px #ff0000cc;
+      filter: drop-shadow(0 0 5px #ff0000cc);
+    }
+
+    .glitch-shape:nth-child(2) {
+      animation-delay: 1s;
+      background: #ff5555cc;
+      box-shadow: 0 0 5px #ff5555cc;
+      filter: drop-shadow(0 0 5px #ff5555cc);
+    }
+
+    .glitch-shape:nth-child(3) {
+      animation-delay: 1.7s;
+      background: #ff2222cc;
+      box-shadow: 0 0 10px #ff2222cc;
+      filter: drop-shadow(0 0 8px #ff2222cc);
+    }
+
+    @keyframes glitchMove {
+      0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0.7;
+      }
+      50% {
+        transform: translate(10px, 10px) rotate(15deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0.7;
+      }
+    }
+
+    .selection-box {
+      margin-top: 2rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 0 15px #ff0000aa;
+      color: #000;
+      font-weight: 600;
+      display: none;
+      transition: all 0.3s ease;
+    }
+
+    .selection-box label {
+      display: block;
+      margin-bottom: 0.7rem;
+      font-weight: 700;
+      color: #ff0000;
+    }
+
+    .selection-box input[type="text"] {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ff4444;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .selection-box select,
+    .selection-box input[type="number"] {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ff4444;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <h1>Zenek Studios - Kup bilety na Maciek "Początki"</h1>
+  <div class="ticket-container" role="list" aria-label="Wybór biletów">
+    <div class="ticket" role="listitem" tabindex="0" aria-selected="false" data-type="normal">
+      <div class="ticket-title">Bilet normalny</div>
+      <div class="ticket-price">1 zł</div>
+      <div class="ticket-description">Standardowy bilet dla osoby normalnej, uprawnia do obejrzenia tego masterpiece.</div>
+    </div>
+    <div class="ticket" role="listitem" tabindex="0" aria-selected="false" data-type="ulgowy">
+      <div class="ticket-title">Bilet ulgowy</div>
+      <div class="ticket-price">0.50 zł</div>
+      <div class="ticket-description">Dla upośledzonych, idiotów i debili, tez uprawnia do obejrzenia seansu, ale jestes gorszy.</div>
+    </div>
+  </div>
+
+  <form id="ticketForm" class="selection-box" aria-hidden="true" aria-live="polite" aria-label="Formularz zakupu biletów">
+    <label for="fullname">Imię i nazwisko</label>
+    <input type="text" id="fullname" name="fullname" placeholder="Wpisz imię i nazwisko" required />
+
+    <label for="quantity">Ilość biletów</label>
+    <input type="number" id="quantity" name="quantity" min="1" max="10" placeholder="1" required />
+
+    <label for="session">Wybierz seans</label>
+    <select id="session" name="session" required>
+      <option value="">-- Wybierz seans --</option>
+      <option value="maciek-poczatki">Maciek "Początki" - data - podczas wakacji lub pozniej</option>
+    </select>
+
+    <label for="payment">Metoda płatności</label>
+    <select id="payment" name="payment" required>
+      <option value="">-- Wybierz metodę --</option>
+      <option value="blik">BLIK</option>
+      <option value="paypal">PayPal</option>
+      <option value="zen">Zen</option>
+    </select>
+
+    <button type="submit" class="buy-button-animated" aria-label="Kup bilety">Kup bilety</button>
+  </form>
+
+  <footer>
+    <a href="regulamin.html" class="regulamin-link" target="_blank" rel="noopener">Regulamin zakupu biletów</a>
+  </footer>
+
+  <div class="side-animation left" aria-hidden="true">
+    <div class="animated-line"></div>
+    <div class="glitch-shape"></div>
+    <div class="animated-line"></div>
+  </div>
+  <div class="side-animation right" aria-hidden="true">
+    <div class="animated-line"></div>
+    <div class="glitch-shape"></div>
+    <div class="animated-line"></div>
+  </div>
+
+  <script>
+    const tickets = document.querySelectorAll('.ticket');
+    const form = document.getElementById('ticketForm');
+    const selectionBox = form;
+    let selectedTicketType = null;
+
+    tickets.forEach(ticket => {
+      ticket.addEventListener('click', () => {
+        tickets.forEach(t => {
+          t.classList.remove('selected');
+          t.setAttribute('aria-selected', 'false');
+        });
+
+        ticket.classList.add('selected');
+        ticket.setAttribute('aria-selected', 'true');
+        selectedTicketType = ticket.getAttribute('data-type');
+
+        selectionBox.style.display = 'block';
+        selectionBox.setAttribute('aria-hidden', 'false');
+        form.fullname.focus();
+      });
+
+      ticket.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          ticket.click();
+        }
+      });
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const fullname = form.fullname.value.trim();
+      const quantity = form.quantity.value;
+      const session = form.session.value;
+      const payment = form.payment.value;
+
+      if (!selectedTicketType) {
+        alert('Proszę wybrać typ biletu.');
+        return;
+      }
+
+      if (!fullname) {
+        alert('Proszę wpisać imię i nazwisko.');
+        form.fullname.focus();
+        return;
+      }
+
+      if (!quantity || quantity < 1) {
+        alert('Proszę wpisać poprawną ilość biletów.');
+        form.quantity.focus();
+        return;
+      }
+      if (!session) {
+        alert('Proszę wybrać seans.');
+        form.session.focus();
+        return;
+      }
+      if (!payment) {
+        alert('Proszę wybrać metodę płatności.');
+        form.payment.focus();
+        return;
+      }
+
+      // Zapis danych zamówienia
+      const orderData = {
+        ticketType: selectedTicketType,
+        fullname: fullname,
+        quantity: quantity,
+        session: session,
+        payment: payment
+      };
+      localStorage.setItem('ticketOrder', JSON.stringify(orderData));
+
+      // Przekierowanie
+      window.location.href = 'dziekujemy.html';
+    });
+  </script>
+  <!-- Przycisk Trailery po lewej stronie -->
+<a href="trailery.html" class="btn-trailery" aria-label="Przejdź do strony z trailerami" tabindex="0">
+  Trailery
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="20" height="20" style="margin-left:8px;fill:#fff;">
+    <path d="M8 5v14l11-7z" />
+  </svg>
+</a>
+
+<style>
+  .btn-trailery {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #ff0000, #ff4444);
+    color: white;
+    padding: 1rem 2rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    box-shadow: 0 0 15px #ff0000cc;
+    cursor: pointer;
+    text-decoration: none;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    user-select: none;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  .btn-trailery:hover,
+  .btn-trailery:focus {
+    box-shadow: 0 0 35px #ff0000ee, 0 0 60px #ff4444cc;
+    transform: translateY(-50%) scale(1.05);
+    outline: none;
+  }
+  .btn-trailery svg {
+    animation: moveIcon 2s ease-in-out infinite alternate;
+  }
+  @keyframes moveIcon {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+  }
+</style>
+
+</body>
+</html>
